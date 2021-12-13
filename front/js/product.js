@@ -57,54 +57,77 @@ function afficheCouleurs(data) {
 // Récupération des informations sélectionnées lors du click sur "Ajouter au panier"
 document.getElementById("addToCart").addEventListener("click", function ajoutLocalStorage() {
 
-        //ID du Produit
-        const idProduit = id;
-        
-        //Nom du Produit
-        const nomProduit = document.getElementById('title').innerText;
+    //ID du Produit
+    const idProduit = id;
+    
+    //Nom du Produit
+    const nomProduit = document.getElementById('title').innerText;
 
-        //Prix du Produit
-        const prixProduit = document.getElementById('price').innerText;
+    //Image du Produit
+    const imageInfos = document.getElementsByClassName('item__img') ;
+    const imageProduit = imageInfos[0].children[0].currentSrc;
 
-        //Couleur sélectionnée
-        const listeCouleurs = document.getElementById('colors');
-        const couleurProduit = listeCouleurs.options[listeCouleurs.selectedIndex].innerText;
+    //Prix du Produit
+    const prixProduit = document.getElementById('price').innerText;
 
-        //Quantité souhaité par l'acheteur
-        const quantiteProduit = document.getElementById('quantity').value;
+    //Couleur sélectionnée
+    const listeCouleurs = document.getElementById('colors');
+    const couleurProduit = listeCouleurs.options[listeCouleurs.selectedIndex].innerText;
 
-        //Prix Total à payer pour cette commande
-        const prixTotal = prixProduit * quantiteProduit;
+    //Quantité souhaité par l'acheteur
+    const quantiteProduit = document.getElementById('quantity').value;
+
+    if (listeCouleurs.options[listeCouleurs.selectedIndex].value == "") {
+        alert("Veuillez choisir une couleur")
+    }else{
+        if (quantiteProduit == 0) {
+            alert("Veuillez préciser la quantité souhaitée")
+        }else{
 
 // Ajout des informations sélectionnées au localStorage
 
         // Création du tableau contenant toutes les données à ajouter au LocalStorage
-        let infosProduitSelectionne = {
-            idProduit,
-            nomProduit,
-            prixProduit,
-            couleurProduit,
-            quantiteProduit,
-            prixTotal,
-        }
+            let infosProduitSelectionne = {
+                idProduit,
+                nomProduit,
+                imageProduit,
+                prixProduit,
+                couleurProduit,
+                quantiteProduit,
+            }
 
-        // On récupère les info qui nous intéressent pour savoir si elles ont déjà été saisis
-        let IDProduitSelectionne = infosProduitSelectionne['idProduit'];
-        let CouleurProduitSelectionne = infosProduitSelectionne['couleurProduit'];
+            // On récupère les info qui nous intéressent pour savoir si elles ont déjà été saisis
+            let IDProduitSelectionne = infosProduitSelectionne['idProduit'];
+            let CouleurProduitSelectionne = infosProduitSelectionne['couleurProduit'];
 
-        // On récupère les infos du LocalStorage pour savoir s'il est vide ou non
-        let produitsDansLePanier = JSON.parse(localStorage.getItem("monPanier"));
+            // On récupère les infos du LocalStorage pour savoir, plus tard, s'il est vide ou non
+            let produitsDansLePanier = JSON.parse(localStorage.getItem("monPanier"));
 
             // Si localStorage contient déjà un produit = ajoute le produit à la liste existante
-            if(produitsDansLePanier){
-                produitsDansLePanier.push(infosProduitSelectionne);
-                localStorage.setItem("monPanier", JSON.stringify(produitsDansLePanier))   
-            }else{
-                // Si localStorage est vide = on créé un tableau monPanier + on ajoute le produit à la liste
+            let found = false;
+
+            if(produitsDansLePanier !== null){      
+                for (let i = 0; i < produitsDansLePanier.length; i++) {
+                    if (IDProduitSelectionne == produitsDansLePanier[i].idProduit && CouleurProduitSelectionne == produitsDansLePanier[i].couleurProduit) {     
+                        //Je remplace le produitsDansLePanier[i].Quantity dans le localStorage                 
+                        found = true;
+                        produitsDansLePanier[i].quantiteProduit = infosProduitSelectionne.quantiteProduit;
+                        localStorage.setItem("monPanier", JSON.stringify(produitsDansLePanier))
+                        break
+                    }
+                }
+            } else {
                 produitsDansLePanier = [];
+            }
+
+            if (found == false) {
+                // Si localStorage est vide ou meme canap introuvable = on créé un tableau monPanier + on ajoute le produit à la liste
                 produitsDansLePanier.push(infosProduitSelectionne);
                 localStorage.setItem("monPanier", JSON.stringify(produitsDansLePanier))
             }
-});
+            alert("Ce produit a été ajouté : retrouvez-le dans votre panier.");
+        }
+    }
+})
 
 
